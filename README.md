@@ -15,8 +15,7 @@ A Python + SQLite based Student Result Management System that stores student rec
 ⸻
 
 🛠 Tech Stack
-	•	Python
-	•	SQLite
-
-⸻
+	•	Programming Language: Python
+	•	Database: SQLite
+	•	Concepts Used: CRUD operations, database management, basic data analysis
 
