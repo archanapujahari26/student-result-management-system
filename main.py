@@ -11,6 +11,7 @@ def calculate_grade(percentage):
     else:
         return "Fail"
 
+# ---------------- ADD ----------------
 def add_student():
     name = input("Enter student name: ")
     s1 = int(input("Enter Subject 1 marks: "))
@@ -33,6 +34,7 @@ def add_student():
     
     print("✅ Student added successfully!")
 
+# ---------------- VIEW ----------------
 def view_students():
     conn = connect()
     cursor = conn.cursor()
@@ -49,6 +51,73 @@ def view_students():
     
     conn.close()
 
+# ---------------- SEARCH ----------------
+def search_student():
+    name = input("Enter student name to search: ")
+    
+    conn = connect()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM students WHERE name=?", (name,))
+    result = cursor.fetchall()
+    
+    if result:
+        for row in result:
+            print(row)
+    else:
+        print("Student not found.")
+    
+    conn.close()
+
+# ---------------- UPDATE ----------------
+def update_student():
+    student_id = input("Enter student ID to update: ")
+    
+    conn = connect()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM students WHERE id=?", (student_id,))
+    data = cursor.fetchone()
+    
+    if not data:
+        print("Student not found.")
+        return
+    
+    print("Enter new details:")
+    name = input("Name: ")
+    s1 = int(input("Subject 1: "))
+    s2 = int(input("Subject 2: "))
+    s3 = int(input("Subject 3: "))
+    
+    percentage = (s1 + s2 + s3) / 3
+    grade = calculate_grade(percentage)
+    
+    cursor.execute("""
+    UPDATE students
+    SET name=?, subject1=?, subject2=?, subject3=?, percentage=?, grade=?
+    WHERE id=?
+    """, (name, s1, s2, s3, percentage, grade, student_id))
+    
+    conn.commit()
+    conn.close()
+    
+    print("✅ Student updated successfully!")
+
+# ---------------- DELETE ----------------
+def delete_student():
+    student_id = input("Enter student ID to delete: ")
+    
+    conn = connect()
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM students WHERE id=?", (student_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    print("❌ Student deleted successfully!")
+
+# ---------------- CHART ----------------
 def show_chart():
     conn = connect()
     cursor = conn.cursor()
@@ -73,6 +142,7 @@ def show_chart():
 
     conn.close()
 
+# ---------------- MENU ----------------
 def menu():
     create_table()
     
@@ -80,8 +150,11 @@ def menu():
         print("\n--- Student Result System ---")
         print("1. Add Student")
         print("2. View Students")
-        print("3. Show Chart")
-        print("4. Exit")
+        print("3. Search Student")
+        print("4. Update Student")
+        print("5. Delete Student")
+        print("6. Show Chart")
+        print("7. Exit")
         
         choice = input("Enter choice: ")
         
@@ -90,8 +163,14 @@ def menu():
         elif choice == "2":
             view_students()
         elif choice == "3":
-            show_chart()
+            search_student()
         elif choice == "4":
+            update_student()
+        elif choice == "5":
+            delete_student()
+        elif choice == "6":
+            show_chart()
+        elif choice == "7":
             print("Exiting...")
             break
         else:
