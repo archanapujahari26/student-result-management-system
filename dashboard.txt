@@ -1,0 +1,11 @@
+📊 --- DASHBOARD ---
+Total Students: 200
+Average Percentage: 72.45
+Top Performer: Rahul99 (95.33)
+Lowest Performer: Amit12 (41.67)
+
+Grade Distribution:
+Grade A: 25 students
+Grade B: 80 students
+Grade C: 70 students
+Grade Fail: 25 students
