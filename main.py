@@ -203,6 +203,42 @@ def show_chart():
 
     conn.close()
 
+# ---------------- DASHBOARD ----------------
+def show_dashboard():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM students")
+    total = cursor.fetchone()[0]
+
+    if total == 0:
+        print("No data available!")
+        return
+
+    cursor.execute("SELECT AVG(percentage) FROM students")
+    avg = cursor.fetchone()[0]
+
+    cursor.execute("SELECT name, percentage FROM students ORDER BY percentage DESC LIMIT 1")
+    top = cursor.fetchone()
+
+    cursor.execute("SELECT name, percentage FROM students ORDER BY percentage ASC LIMIT 1")
+    low = cursor.fetchone()
+
+    cursor.execute("SELECT grade, COUNT(*) FROM students GROUP BY grade")
+    grades = cursor.fetchall()
+
+    print("\n📊 --- DASHBOARD ---")
+    print(f"Total Students: {total}")
+    print(f"Average Percentage: {avg:.2f}")
+    print(f"Top Performer: {top[0]} ({top[1]:.2f})")
+    print(f"Lowest Performer: {low[0]} ({low[1]:.2f})")
+
+    print("\nGrade Distribution:")
+    for g in grades:
+        print(f"Grade {g[0]}: {g[1]} students")
+
+    conn.close()
+
 # ---------------- MENU ----------------
 def menu():
     create_table()
@@ -217,7 +253,8 @@ def menu():
         print("6. Show Chart")
         print("7. Insert 200 Students (Auto)")
         print("8. Import from CSV")
-        print("9. Exit")
+        print("9. Dashboard (Analytics)")
+        print("10. Exit")
         
         choice = input("Enter choice: ")
         
@@ -238,6 +275,8 @@ def menu():
         elif choice == "8":
             import_from_csv()
         elif choice == "9":
+            show_dashboard()
+        elif choice == "10":
             print("Exiting...")
             break
         else:
