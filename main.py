@@ -1,4 +1,5 @@
 from database import create_table, connect
+import matplotlib.pyplot as plt
 
 def calculate_grade(percentage):
     if percentage >= 90:
@@ -30,7 +31,7 @@ def add_student():
     conn.commit()
     conn.close()
     
-    print("Student added successfully!")
+    print("✅ Student added successfully!")
 
 def view_students():
     conn = connect()
@@ -39,9 +40,37 @@ def view_students():
     cursor.execute("SELECT * FROM students")
     rows = cursor.fetchall()
     
-    for row in rows:
-        print(row)
+    if not rows:
+        print("No records found.")
+    else:
+        print("\n--- Student Records ---")
+        for row in rows:
+            print(row)
     
+    conn.close()
+
+def show_chart():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name, percentage FROM students")
+    data = cursor.fetchall()
+
+    if not data:
+        print("No data to display!")
+        return
+
+    names = [row[0] for row in data]
+    percentages = [row[1] for row in data]
+
+    plt.bar(names, percentages)
+    plt.xlabel("Students")
+    plt.ylabel("Percentage")
+    plt.title("Student Performance Chart")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
     conn.close()
 
 def menu():
@@ -51,7 +80,8 @@ def menu():
         print("\n--- Student Result System ---")
         print("1. Add Student")
         print("2. View Students")
-        print("3. Exit")
+        print("3. Show Chart")
+        print("4. Exit")
         
         choice = input("Enter choice: ")
         
@@ -60,6 +90,9 @@ def menu():
         elif choice == "2":
             view_students()
         elif choice == "3":
+            show_chart()
+        elif choice == "4":
+            print("Exiting...")
             break
         else:
             print("Invalid choice!")
