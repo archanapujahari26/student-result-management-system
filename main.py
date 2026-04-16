@@ -1,6 +1,9 @@
 from database import create_table, connect
 import matplotlib.pyplot as plt
+import random
+import csv
 
+# ---------------- GRADE ----------------
 def calculate_grade(percentage):
     if percentage >= 90:
         return "A"
@@ -117,6 +120,64 @@ def delete_student():
     
     print("❌ Student deleted successfully!")
 
+# ---------------- BULK INSERT ----------------
+def insert_bulk_students(n=200):
+    conn = connect()
+    cursor = conn.cursor()
+
+    names = ["Rahul", "Amit", "Priya", "Sneha", "Arjun", "Kiran", "Ravi", "Anjali", "Neha", "Vikas"]
+
+    for i in range(n):
+        name = random.choice(names) + str(i)
+
+        s1 = random.randint(40, 100)
+        s2 = random.randint(40, 100)
+        s3 = random.randint(40, 100)
+
+        percentage = (s1 + s2 + s3) / 3
+        grade = calculate_grade(percentage)
+
+        cursor.execute("""
+        INSERT INTO students (name, subject1, subject2, subject3, percentage, grade)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, s1, s2, s3, percentage, grade))
+
+    conn.commit()
+    conn.close()
+
+    print(f"✅ {n} students inserted successfully!")
+
+# ---------------- CSV IMPORT ----------------
+def import_from_csv(filename="students.csv"):
+    conn = connect()
+    cursor = conn.cursor()
+
+    try:
+        with open(filename, newline='') as file:
+            reader = csv.DictReader(file)
+
+            for row in reader:
+                name = row['name']
+                s1 = int(row['subject1'])
+                s2 = int(row['subject2'])
+                s3 = int(row['subject3'])
+
+                percentage = (s1 + s2 + s3) / 3
+                grade = calculate_grade(percentage)
+
+                cursor.execute("""
+                INSERT INTO students (name, subject1, subject2, subject3, percentage, grade)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """, (name, s1, s2, s3, percentage, grade))
+
+        conn.commit()
+        print("✅ Data imported from CSV!")
+
+    except FileNotFoundError:
+        print("❌ CSV file not found!")
+
+    conn.close()
+
 # ---------------- CHART ----------------
 def show_chart():
     conn = connect()
@@ -154,7 +215,9 @@ def menu():
         print("4. Update Student")
         print("5. Delete Student")
         print("6. Show Chart")
-        print("7. Exit")
+        print("7. Insert 200 Students (Auto)")
+        print("8. Import from CSV")
+        print("9. Exit")
         
         choice = input("Enter choice: ")
         
@@ -171,6 +234,10 @@ def menu():
         elif choice == "6":
             show_chart()
         elif choice == "7":
+            insert_bulk_students()
+        elif choice == "8":
+            import_from_csv()
+        elif choice == "9":
             print("Exiting...")
             break
         else:
